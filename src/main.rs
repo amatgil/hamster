@@ -10,9 +10,12 @@ const HAMSTER_BACKGROUND: Color = Color {
 };
 
 fn main() {
-    let (mut rl, thread) = raylib::init().size(640, 480).title("Hello, World").build();
+    let (mut rl, thread) = raylib::init().title("Hamster").build();
 
     rl.set_window_opacity(HAMSTER_OPACITY);
+    rl.toggle_borderless_windowed();
+
+    //let m = get_current_monitor_index();
 
     while !rl.window_should_close() {
         let mut d = rl.begin_drawing(&thread);
