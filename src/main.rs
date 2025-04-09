@@ -16,8 +16,11 @@ const GRID_WIDTH: i32 = 13;
 
 const CHILD_GAP: f32 = 2.5;
 
-const PADDING_W: usize = 10;
-const PADDING_H: usize = 10;
+const PADDING_W: i32 = 0;
+const PADDING_H: i32 = 0;
+
+const FONT_SIZE: i32 = 100;
+const TEXT_COLOR: Color = Color::BLACK;
 
 fn main() {
     let keys = vec![
@@ -63,6 +66,12 @@ fn main() {
             );
         }
 
-        //d.draw_text("Hello, world!", 12, 12, 20, Color::BLACK);
+        d.draw_text(
+            &keys[0][0].to_string(),
+            PADDING_W + FONT_SIZE / 2,
+            PADDING_H + FONT_SIZE / 2,
+            FONT_SIZE,
+            TEXT_COLOR,
+        );
     }
 }
