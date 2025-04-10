@@ -38,6 +38,10 @@ pub enum HWheelError {
     ClickButtonIsntNumber,
     ClickButtonIsNotButton,
     CouldNotReachXDoTool(Box<dyn Error>),
+    NoMoveY,
+    NoMoveX,
+    InvalidMoveY,
+    InvalidMoveX,
 }
 
 impl Display for HWheelError {
@@ -49,6 +53,10 @@ impl Display for HWheelError {
             Self::ClickButtonIsntNumber => "button number must be a number",
             Self::ClickButtonIsNotButton => "button number was not 1, 2 or 3",
             Self::CouldNotReachXDoTool(e) => &format!("could not run 'xdotool': {e}"),
+            Self::NoMoveY => "moved without providing row",
+            Self::NoMoveX => "moved without providing column",
+            Self::InvalidMoveY => "invalid move row",
+            Self::InvalidMoveX => "invalid move column",
         };
 
         write!(f, "{}", s)
@@ -63,6 +71,10 @@ impl Termination for HWheelError {
             Self::ClickButtonIsntNumber => ExitCode::from(13),
             Self::ClickButtonIsNotButton => ExitCode::from(14),
             Self::CouldNotReachXDoTool(_e) => ExitCode::from(15),
+            Self::NoMoveY => ExitCode::from(16),
+            Self::NoMoveX => ExitCode::from(17),
+            Self::InvalidMoveY => ExitCode::from(18),
+            Self::InvalidMoveX => ExitCode::from(19),
         }
     }
 }
@@ -82,10 +94,15 @@ pub fn scrolldown() -> Result<(), HWheelError> {
     click("5")
 }
 
-pub fn _click(button: usize) -> Result<(), HWheelError> {
-    if button < 1 || button > 3 {
-        return Err(HWheelError::ClickButtonIsNotButton);
-        //bail("")
+pub fn moveto(y: usize, x: usize) -> Result<(), HWheelError> {
+    match Command::new("xdotool")
+        .arg("mousemove")
+        .arg("--sync")
+        .arg(x.to_string())
+        .arg(y.to_string())
+        .spawn()
+    {
+        Ok(_c) => Ok(()),
+        Err(e) => Err(HWheelError::CouldNotReachXDoTool(Box::new(e))),
     }
-    todo!()
 }

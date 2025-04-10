@@ -19,7 +19,22 @@ fn main() -> Result<(), HWheelError> {
             let Ok(_b): Result<usize, _> = b.parse() else {
                 return Err(HWheelError::ClickButtonIsntNumber);
             };
-            click(&b)?;
+            click(&b)?
+        }
+        "moveto" => {
+            let Some(y) = args().nth(2) else {
+                return Err(HWheelError::NoMoveY);
+            };
+            let Ok(y) = y.parse() else {
+                return Err(HWheelError::InvalidMoveY);
+            };
+            let Some(x) = args().nth(3) else {
+                return Err(HWheelError::NoMoveX);
+            };
+            let Ok(x) = x.parse() else {
+                return Err(HWheelError::InvalidMoveX);
+            };
+            moveto(y, x)?
         }
         _ => {}
     }
