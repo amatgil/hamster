@@ -35,5 +35,4 @@ fn main() -> Result<(), HWheelError> {
         _ => {}
     }
     Ok(())
-    //bring_up_overlay();
 }
