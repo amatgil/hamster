@@ -9,7 +9,6 @@ pub fn bring_up_overlay() {
     ];
 
     assert!(keys.len() > 0);
-    unsafe { ffi::SetConfigFlags(ConfigFlags::FLAG_WINDOW_MOUSE_PASSTHROUGH as u32) };
     let (mut rl, thread) = raylib::init().title("Hamster").build();
 
     rl.set_window_opacity(HAMSTER_OPACITY);

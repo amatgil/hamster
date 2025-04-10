@@ -1,17 +1,28 @@
 mod overlay;
 use std::env::args;
 
+use hamsterwheel::*;
 use overlay::bring_up_overlay;
 
-enum ExitCodes {
-    ForgotArgument = 10,
-}
-
-fn main() {
+fn main() -> HWheelReturn {
     let Some(arg) = args().nth(1) else {
-        eprintln!("No argument given, exiting...");
-        std::process::exit(ExitCodes::ForgotArgument as i32);
+        return HWheelReturn::ForgotArgument;
     };
-    dbg!(arg);
+    match &*arg {
+        "overlay" => bring_up_overlay(),
+        "scrollup" => scrollup(),
+        "scrolldown" => scrolldown(),
+        "click" => {
+            let Some(b) = args().nth(2) else {
+                return HWheelReturn::NoClickButton;
+            };
+            let Ok(b) = b.parse() else {
+                return HWheelReturn::ClickButtonIsntNumber;
+            };
+            click(b);
+        }
+        _ => {}
+    }
+    HWheelReturn::Success
     //bring_up_overlay();
 }
