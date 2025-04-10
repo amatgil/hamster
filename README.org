@@ -1,0 +1,23 @@
+* Hamster
+
+
+Replace your mouse with your keyboard!
+
+Heavily inspired by [[mouseless][https://mouseless.click]].
+
+** Install
+*** NixOS
+#+begin_src bash
+  direnv allow
+  cargo build --release
+#+end_src
+*** Other
+Install required dependencies (see =shell.nix=), then =make=.
+
+** Usage
+*** Clicking
+TODO
+*** Scrolling
+=C-e= and =C-y= whilst under layout
+** Demo
+TODO

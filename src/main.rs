@@ -1,4 +1,4 @@
-use raylib::prelude::*;
+use raylib::{ffi::SetConfigFlags, prelude::*};
 
 const HAMSTER_OPACITY: f32 = 0.2;
 const HAMSTER_BACKGROUND: Color = Color {
@@ -22,6 +22,8 @@ const PADDING_H: i32 = 0;
 const FONT_SIZE: i32 = 100;
 const TEXT_COLOR: Color = Color::BLACK;
 
+const TARGET_FPS: u32 = 20;
+
 fn main() {
     let keys = vec![
         vec!['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
@@ -29,12 +31,15 @@ fn main() {
         vec!['z', 'x', 'c', 'v', 'b', 'n', 'm'],
     ];
 
+    assert!(keys.len() > 0);
+    unsafe { ffi::SetConfigFlags(ConfigFlags::FLAG_WINDOW_MOUSE_PASSTHROUGH as u32) };
     let (mut rl, thread) = raylib::init().title("Hamster").build();
 
     rl.set_window_opacity(HAMSTER_OPACITY);
     rl.toggle_borderless_windowed();
 
-    assert!(keys.len() > 0);
+    rl.set_exit_key(Some(KeyboardKey::KEY_ESCAPE));
+    rl.set_target_fps(TARGET_FPS);
 
     while !rl.window_should_close() {
         let curr_mon = get_current_monitor();
