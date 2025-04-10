@@ -4,9 +4,9 @@ use std::env::args;
 use hamsterwheel::*;
 use overlay::bring_up_overlay;
 
-fn main() -> HWheelReturn {
+fn main() -> Result<(), HWheelError> {
     let Some(arg) = args().nth(1) else {
-        return HWheelReturn::ForgotArgument;
+        return Err(HWheelError::ForgotArgument);
     };
     match &*arg {
         "overlay" => bring_up_overlay(),
@@ -14,15 +14,15 @@ fn main() -> HWheelReturn {
         "scrolldown" => scrolldown(),
         "click" => {
             let Some(b) = args().nth(2) else {
-                return HWheelReturn::NoClickButton;
+                return Err(HWheelError::NoClickButton);
             };
             let Ok(b) = b.parse() else {
-                return HWheelReturn::ClickButtonIsntNumber;
+                return Err(HWheelError::ClickButtonIsntNumber);
             };
-            click(b);
+            click(b)?;
         }
         _ => {}
     }
-    HWheelReturn::Success
+    Ok(())
     //bring_up_overlay();
 }
