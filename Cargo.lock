@@ -96,6 +96,14 @@ checksum = "a8d1add55171497b4705a648c6b583acafb01d58050a51727785f0b2c8e0a2b2"
 [[package]]
 name = "hamster"
 version = "0.1.0"
+
+[[package]]
+name = "hamstersend"
+version = "0.1.0"
+
+[[package]]
+name = "hamsterwheel"
+version = "0.1.0"
 dependencies = [
  "raylib",
 ]

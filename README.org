@@ -16,10 +16,15 @@ Install required dependencies (see =shell.nix=), then =make=.
 
 ** Usage
 The core of =hamster= is the deamon (=hamsterwheel=): it waits for commands sent to it. Once it runs, commands can be sent via:
-- =hamster overlay=: cover the screen in a grid for moving the mouse
-- =hamster scrollup=: scroll up
-- =hamster scrolldown=: scroll down
-- =hamster click N=: click mouse button N (1 <= N <= 5)
+- =hamstersend overlay=: cover the screen in a grid for moving the mouse
+- =hamstersend scrollup=: scroll up
+- =hamstersend scrolldown=: scroll down
+- =hamstersend click N=: click mouse button N (1 <= N <= 5)
+
+*** The Overlay
+- Press =Esc= to close it
+- Press the two keys corresponding to the cell to move the mouse to its center.
+- Press =L= to lock the overlay (it won't go away after moving the mouse). Not that you cannot click through the overlay because mouse passsthrough apparently dosen't exist. This will make the selected cell, if any, recursively give more options for more cliking precision.
 
 ** Demo
 TODO

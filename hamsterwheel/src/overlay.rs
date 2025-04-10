@@ -1,30 +1,7 @@
-use raylib::{ffi::SetConfigFlags, prelude::*};
+use hamsterwheel::*;
+use raylib::prelude::*;
 
-const HAMSTER_OPACITY: f32 = 0.2;
-const HAMSTER_BACKGROUND: Color = Color {
-    // TODO: Make this look good
-    r: 62,
-    g: 176,
-    b: 60,
-    a: 0,
-};
-
-/// Elements per row
-const GRID_HEIGHT: i32 = 13;
-/// Elements per column
-const GRID_WIDTH: i32 = 13;
-
-const CHILD_GAP: f32 = 2.5;
-
-const PADDING_W: i32 = 0;
-const PADDING_H: i32 = 0;
-
-const FONT_SIZE: i32 = 100;
-const TEXT_COLOR: Color = Color::BLACK;
-
-const TARGET_FPS: u32 = 20;
-
-fn main() {
+pub fn bring_up_overlay() {
     let keys = vec![
         vec!['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
         vec!['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
