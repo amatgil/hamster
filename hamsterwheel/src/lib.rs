@@ -99,15 +99,14 @@ pub fn scrolldown() -> Result<(), HWheelError> {
     click("5")
 }
 
-pub fn moveto(y: usize, x: usize, screen: Option<usize>) -> Result<(), HWheelError> {
+pub fn moveto(y: usize, x: usize) -> Result<(), HWheelError> {
     let mut c = Command::new("xdotool"); // sigh, forced bindings
 
-    let mut c = c.arg("mousemove").arg("--sync");
-
-    if let Some(s) = screen {
-        c = c.arg("--screen").arg(s.to_string());
-    }
-    let c = c.arg(x.to_string()).arg(y.to_string());
+    let c = c
+        .arg("mousemove")
+        .arg("--sync")
+        .arg(x.to_string())
+        .arg(y.to_string());
 
     match c.spawn() {
         Ok(_c) => Ok(()),
