@@ -42,6 +42,7 @@ pub enum HWheelError {
     NoMoveX,
     InvalidMoveY,
     InvalidMoveX,
+    MonitorIsntInteger,
 }
 
 impl Display for HWheelError {
@@ -52,11 +53,14 @@ impl Display for HWheelError {
             Self::NoClickButton => "click command sent with no button number",
             Self::ClickButtonIsntNumber => "button number must be a number",
             Self::ClickButtonIsNotButton => "button number was not 1, 2 or 3",
-            Self::CouldNotReachXDoTool(e) => &format!("could not run 'xdotool': {e}"),
+            Self::CouldNotReachXDoTool(e) => {
+                &format!("could not run 'xdotool', is it installed?: {e}")
+            }
             Self::NoMoveY => "moved without providing row",
             Self::NoMoveX => "moved without providing column",
             Self::InvalidMoveY => "invalid move row",
             Self::InvalidMoveX => "invalid move column",
+            Self::MonitorIsntInteger => "monitor is not integer",
         };
 
         write!(f, "{}", s)
@@ -75,6 +79,7 @@ impl Termination for HWheelError {
             Self::NoMoveX => ExitCode::from(17),
             Self::InvalidMoveY => ExitCode::from(18),
             Self::InvalidMoveX => ExitCode::from(19),
+            Self::MonitorIsntInteger => ExitCode::from(20),
         }
     }
 }
@@ -94,14 +99,17 @@ pub fn scrolldown() -> Result<(), HWheelError> {
     click("5")
 }
 
-pub fn moveto(y: usize, x: usize) -> Result<(), HWheelError> {
-    match Command::new("xdotool")
-        .arg("mousemove")
-        .arg("--sync")
-        .arg(x.to_string())
-        .arg(y.to_string())
-        .spawn()
-    {
+pub fn moveto(y: usize, x: usize, screen: Option<usize>) -> Result<(), HWheelError> {
+    let mut c = Command::new("xdotool"); // sigh, forced bindings
+
+    let mut c = c.arg("mousemove").arg("--sync");
+
+    if let Some(s) = screen {
+        c = c.arg("--screen").arg(s.to_string());
+    }
+    let c = c.arg(x.to_string()).arg(y.to_string());
+
+    match c.spawn() {
         Ok(_c) => Ok(()),
         Err(e) => Err(HWheelError::CouldNotReachXDoTool(Box::new(e))),
     }

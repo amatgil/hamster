@@ -34,7 +34,14 @@ fn main() -> Result<(), HWheelError> {
             let Ok(x) = x.parse() else {
                 return Err(HWheelError::InvalidMoveX);
             };
-            moveto(y, x)?
+
+            let m = args()
+                .nth(4)
+                .as_deref()
+                .map(str::parse)
+                .transpose()
+                .map_err(|_| HWheelError::MonitorIsntInteger)?;
+            moveto(y, x, m)?
         }
         _ => {}
     }
