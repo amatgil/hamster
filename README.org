@@ -3,7 +3,7 @@
 
 Replace your mouse with your keyboard!
 
-Heavily inspired by [[mouseless][https://mouseless.click]].
+Main concept was inspired by [[mouseless][https://mouseless.click]].
 
 ** Install
 *** NixOS
@@ -15,9 +15,11 @@ Heavily inspired by [[mouseless][https://mouseless.click]].
 Install required dependencies (see =shell.nix=), then =make=.
 
 ** Usage
-*** Clicking
-TODO
-*** Scrolling
-=C-e= and =C-y= whilst under layout
+The core of =hamster= is the deamon (=hamsterwheel=): it waits for commands sent to it. Once it runs, commands can be sent via:
+- =hamster overlay=: cover the screen in a grid for moving the mouse
+- =hamster scrollup=: scroll up
+- =hamster scrolldown=: scroll down
+- =hamster click N=: click mouse button N (1 <= N <= 5)
+
 ** Demo
 TODO
