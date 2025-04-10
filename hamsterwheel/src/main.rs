@@ -9,17 +9,17 @@ fn main() -> Result<(), HWheelError> {
         return Err(HWheelError::ForgotArgument);
     };
     match &*arg {
-        "overlay" => bring_up_overlay(),
-        "scrollup" => scrollup(),
-        "scrolldown" => scrolldown(),
+        "overlay" => bring_up_overlay()?,
+        "scrollup" => scrollup()?,
+        "scrolldown" => scrolldown()?,
         "click" => {
             let Some(b) = args().nth(2) else {
                 return Err(HWheelError::NoClickButton);
             };
-            let Ok(b) = b.parse() else {
+            let Ok(_b): Result<usize, _> = b.parse() else {
                 return Err(HWheelError::ClickButtonIsntNumber);
             };
-            click(b)?;
+            click(&b)?;
         }
         _ => {}
     }

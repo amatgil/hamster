@@ -1,6 +1,7 @@
 use std::{
+    error::Error,
     fmt::Display,
-    process::{ExitCode, Termination},
+    process::{Command, ExitCode, Termination},
 };
 
 use raylib::prelude::*;
@@ -36,6 +37,7 @@ pub enum HWheelError {
     NoClickButton,
     ClickButtonIsntNumber,
     ClickButtonIsNotButton,
+    CouldNotReachXDoTool(Box<dyn Error>),
 }
 
 impl Display for HWheelError {
@@ -45,7 +47,8 @@ impl Display for HWheelError {
             Self::UnrecognizedArg(s) => &format!("could not recognize argument: {s}"),
             Self::NoClickButton => "click command sent with no button number",
             Self::ClickButtonIsntNumber => "button number must be a number",
-            HWheelError::ClickButtonIsNotButton => "button number was not 1, 2 or 3",
+            Self::ClickButtonIsNotButton => "button number was not 1, 2 or 3",
+            Self::CouldNotReachXDoTool(e) => &format!("could not run 'xdotool': {e}"),
         };
 
         write!(f, "{}", s)
@@ -59,17 +62,27 @@ impl Termination for HWheelError {
             Self::NoClickButton => ExitCode::from(12),
             Self::ClickButtonIsntNumber => ExitCode::from(13),
             Self::ClickButtonIsNotButton => ExitCode::from(14),
+            Self::CouldNotReachXDoTool(_e) => ExitCode::from(15),
         }
     }
 }
 
-pub fn scrollup() {
-    todo!()
+pub fn click(btn: &str) -> Result<(), HWheelError> {
+    match Command::new("xdotool").arg("click").arg(btn).spawn() {
+        Ok(_c) => Ok(()),
+        Err(e) => Err(HWheelError::CouldNotReachXDoTool(Box::new(e))),
+    }
 }
-pub fn scrolldown() {
-    todo!()
+
+pub fn scrollup() -> Result<(), HWheelError> {
+    click("4")
 }
-pub fn click(button: usize) -> Result<(), HWheelError> {
+
+pub fn scrolldown() -> Result<(), HWheelError> {
+    click("5")
+}
+
+pub fn _click(button: usize) -> Result<(), HWheelError> {
     if button < 1 || button > 3 {
         return Err(HWheelError::ClickButtonIsNotButton);
         //bail("")

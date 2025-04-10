@@ -1,7 +1,7 @@
 use hamsterwheel::*;
 use raylib::prelude::*;
 
-pub fn bring_up_overlay() {
+pub fn bring_up_overlay() -> Result<(), HWheelError> {
     let keys = vec![
         vec!['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
         vec!['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
@@ -55,4 +55,5 @@ pub fn bring_up_overlay() {
             TEXT_COLOR,
         );
     }
+    Ok(())
 }
