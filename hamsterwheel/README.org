@@ -1,0 +1,2 @@
+* Hamster Wheel
+Where the hamster lives! This is the deamon, it exists waiting for =hamstersend= to send commands.
