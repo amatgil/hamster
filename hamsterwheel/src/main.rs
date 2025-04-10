@@ -13,27 +13,22 @@ fn main() -> Result<(), HWheelError> {
         "scrollup" => scrollup()?,
         "scrolldown" => scrolldown()?,
         "click" => {
-            let Some(b) = args().nth(2) else {
-                return Err(HWheelError::NoClickButton);
-            };
-            let Ok(_b): Result<usize, _> = b.parse() else {
-                return Err(HWheelError::ClickButtonIsntNumber);
-            };
+            let b = args().nth(2).ok_or(HWheelError::NoClickButton)?;
+            // Rough check for numberiness
+            let _: usize = b.parse().map_err(|_| HWheelError::ClickButtonIsntNumber)?;
             click(&b)?
         }
         "moveto" => {
-            let Some(y) = args().nth(2) else {
-                return Err(HWheelError::NoMoveY);
-            };
-            let Ok(y) = y.parse() else {
-                return Err(HWheelError::InvalidMoveY);
-            };
-            let Some(x) = args().nth(3) else {
-                return Err(HWheelError::NoMoveX);
-            };
-            let Ok(x) = x.parse() else {
-                return Err(HWheelError::InvalidMoveX);
-            };
+            let y = args()
+                .nth(2)
+                .ok_or(HWheelError::NoMoveY)?
+                .parse()
+                .map_err(|_| HWheelError::InvalidMoveY)?;
+            let x = args()
+                .nth(3)
+                .ok_or(HWheelError::NoMoveX)?
+                .parse()
+                .map_err(|_| HWheelError::InvalidMoveX)?;
 
             moveto(y, x)?
         }
