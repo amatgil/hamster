@@ -63,7 +63,7 @@ impl Display for HWheelError {
             Self::MonitorIsntInteger => "monitor is not integer",
         };
 
-        write!(f, "{}", s)
+        write!(f, "{s}")
     }
 }
 impl Termination for HWheelError {

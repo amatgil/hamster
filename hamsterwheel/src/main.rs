@@ -1,7 +1,7 @@
 mod overlay;
 use std::env::args;
 
-use hamsterwheel::*;
+use hamsterwheel::{click, moveto, scrolldown, scrollup, HWheelError};
 use overlay::bring_up_overlay;
 
 fn main() -> Result<(), HWheelError> {
@@ -16,7 +16,7 @@ fn main() -> Result<(), HWheelError> {
             let b = args().nth(2).ok_or(HWheelError::NoClickButton)?;
             // Rough check for numberiness
             let _: usize = b.parse().map_err(|_| HWheelError::ClickButtonIsntNumber)?;
-            click(&b)?
+            click(&b)?;
         }
         "moveto" => {
             let y = args()
@@ -30,7 +30,7 @@ fn main() -> Result<(), HWheelError> {
                 .parse()
                 .map_err(|_| HWheelError::InvalidMoveX)?;
 
-            moveto(y, x)?
+            moveto(y, x)?;
         }
         _ => {}
     }

@@ -1,14 +1,17 @@
-use hamsterwheel::*;
+use hamsterwheel::{
+    HWheelError, CHILD_GAP, FONT_SIZE, GRID_HEIGHT, GRID_WIDTH, HAMSTER_BACKGROUND,
+    HAMSTER_OPACITY, PADDING_H, PADDING_W, TARGET_FPS, TEXT_COLOR,
+};
 use raylib::prelude::*;
 
 pub fn bring_up_overlay() -> Result<(), HWheelError> {
-    let keys = vec![
+    let keys = [
         vec!['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
         vec!['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
         vec!['z', 'x', 'c', 'v', 'b', 'n', 'm'],
     ];
 
-    assert!(keys.len() > 0);
+    assert!(!keys.is_empty());
     let (mut rl, thread) = raylib::init().title("Hamster").build();
 
     rl.set_window_opacity(HAMSTER_OPACITY);
@@ -29,7 +32,6 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
         d.clear_background(HAMSTER_BACKGROUND);
 
         for i in 0..GRID_HEIGHT {
-            let i = i as i32;
             d.draw_line_ex(
                 Vector2::new(0 as f32, (cell_height * i) as f32),
                 Vector2::new(mon_w as f32, (cell_height * i) as f32),
@@ -38,7 +40,6 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
             );
         }
         for j in 0..GRID_WIDTH {
-            let j = j as i32;
             d.draw_line_ex(
                 Vector2::new((cell_width * j) as f32, 0 as f32),
                 Vector2::new((cell_width * j) as f32, mon_h as f32),
