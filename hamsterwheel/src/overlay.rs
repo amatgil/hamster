@@ -81,7 +81,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                     TEXT_COLOR,
                 );
                 d.draw_text(
-                    &KEYS.get(0, 1).unwrap_or('?').to_string(),
+                    &KEYS.get(1, (j + i) % GRID_WIDTH).unwrap_or('?').to_string(),
                     j * cell_width + PADDING_W + 3 * font_size / 4,
                     i * cell_height + PADDING_H,
                     font_size,
