@@ -4,6 +4,8 @@ use std::{
     process::{Command, ExitCode, Termination},
 };
 
+mod keys;
+pub use keys::*;
 use raylib::prelude::*;
 
 pub const HAMSTER_OPACITY: f32 = 0.25;

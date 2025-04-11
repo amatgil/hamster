@@ -1,10 +1,16 @@
-use std::default;
+use std::{cell::OnceCell, default};
 
 use hamsterwheel::{
-    HWheelError, CHILD_GAP, FONT_SIZE, GRID_HEIGHT, GRID_WIDTH, HAMSTER_BACKGROUND,
-    HAMSTER_OPACITY, PADDING_H, PADDING_W, TARGET_FPS, TEXT_COLOR,
+    HWheelError, KeyDistribution, CHILD_GAP, FONT_SIZE, GRID_HEIGHT, GRID_WIDTH,
+    HAMSTER_BACKGROUND, HAMSTER_OPACITY, PADDING_H, PADDING_W, TARGET_FPS, TEXT_COLOR,
 };
 use raylib::prelude::*;
+
+const KEYS: KeyDistribution<{ GRID_WIDTH as usize }> = KeyDistribution::new(
+    ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'ñ'],
+    ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '-'],
+);
 
 #[derive(Debug, Default)]
 enum OverlayKind {
@@ -22,18 +28,6 @@ struct OverlayState {
 }
 
 pub fn bring_up_overlay() -> Result<(), HWheelError> {
-    // heap allocated constant, for all intents and purposes
-    let keys = [
-        vec!['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-        vec!['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-        vec!['z', 'x', 'c', 'v', 'b', 'n', 'm'],
-    ];
-
-    assert!(!keys.is_empty());
-    // incorrect, this is what the pairs are for
-    //assert!(GRID_WIDTH <= keys.iter().map(|r| r.len()).min().unwrap() as i32);
-    //assert!(GRID_HEIGHT <= keys.len() as i32);
-
     let (mut rl, thread) = raylib::init().title("Hamster").build();
 
     rl.set_window_opacity(HAMSTER_OPACITY);
@@ -80,14 +74,14 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
             for j in 0..GRID_WIDTH {
                 d.draw_text(
                     // TODO: figure out which keys to show
-                    &keys[0][j as usize].to_string(),
+                    &KEYS.get(0, j).unwrap_or('?').to_string(),
                     j * cell_width + PADDING_W + font_size / 4,
                     i * cell_height + PADDING_H,
                     font_size,
                     TEXT_COLOR,
                 );
                 d.draw_text(
-                    &keys[0][1].to_string(),
+                    &KEYS.get(0, 1).unwrap_or('?').to_string(),
                     j * cell_width + PADDING_W + 3 * font_size / 4,
                     i * cell_height + PADDING_H,
                     font_size,
