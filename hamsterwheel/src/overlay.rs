@@ -11,6 +11,7 @@ struct OverlayState {
 }
 
 pub fn bring_up_overlay() -> Result<(), HWheelError> {
+    // heap allocated constant, for all intents and purposes
     let keys = [
         vec!['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
         vec!['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
@@ -18,6 +19,10 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
     ];
 
     assert!(!keys.is_empty());
+    // incorrect, this is what the pairs are for
+    //assert!(GRID_WIDTH <= keys.iter().map(|r| r.len()).min().unwrap() as i32);
+    //assert!(GRID_HEIGHT <= keys.len() as i32);
+
     let (mut rl, thread) = raylib::init().title("Hamster").build();
 
     rl.set_window_opacity(HAMSTER_OPACITY);
@@ -60,20 +65,25 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
             );
         }
 
-        d.draw_text(
-            &keys[0][0].to_string(),
-            PADDING_W + font_size / 4,
-            PADDING_H,
-            font_size,
-            TEXT_COLOR,
-        );
-        d.draw_text(
-            &keys[0][1].to_string(),
-            PADDING_W + 3 * font_size / 4,
-            PADDING_H,
-            font_size,
-            TEXT_COLOR,
-        );
+        for i in 0..GRID_HEIGHT {
+            for j in 0..GRID_WIDTH {
+                d.draw_text(
+                    // TODO: figure out which keys to show
+                    &keys[0][0].to_string(),
+                    j * cell_width + PADDING_W + font_size / 4,
+                    i * cell_height + PADDING_H,
+                    font_size,
+                    TEXT_COLOR,
+                );
+                d.draw_text(
+                    &keys[0][1].to_string(),
+                    j * cell_width + PADDING_W + 3 * font_size / 4,
+                    i * cell_height + PADDING_H,
+                    font_size,
+                    TEXT_COLOR,
+                );
+            }
+        }
 
         if state.is_locked {
             d.draw_text(

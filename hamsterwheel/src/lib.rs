@@ -6,7 +6,7 @@ use std::{
 
 use raylib::prelude::*;
 
-pub const HAMSTER_OPACITY: f32 = 0.2;
+pub const HAMSTER_OPACITY: f32 = 0.25;
 pub const HAMSTER_BACKGROUND: Color = Color {
     // TODO: Make this look good
     r: 62,
