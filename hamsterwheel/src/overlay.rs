@@ -33,10 +33,10 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
 
         let cell_width = mon_w / GRID_WIDTH;
         let cell_height = mon_h / GRID_HEIGHT;
+        let font_size = cell_height;
 
         if rl.is_key_pressed(KeyboardKey::KEY_L) {
             state.is_locked = !state.is_locked;
-            dbg!("L");
         }
 
         let mut d = rl.begin_drawing(&thread);
@@ -62,9 +62,16 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
 
         d.draw_text(
             &keys[0][0].to_string(),
-            PADDING_W + FONT_SIZE / 2,
-            PADDING_H + FONT_SIZE / 2,
-            FONT_SIZE,
+            PADDING_W + font_size / 4,
+            PADDING_H,
+            font_size,
+            TEXT_COLOR,
+        );
+        d.draw_text(
+            &keys[0][1].to_string(),
+            PADDING_W + 3 * font_size / 4,
+            PADDING_H,
+            font_size,
             TEXT_COLOR,
         );
 
