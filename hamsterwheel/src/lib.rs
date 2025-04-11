@@ -91,14 +91,6 @@ pub fn click(btn: &str) -> Result<(), HWheelError> {
     }
 }
 
-pub fn scrollup() -> Result<(), HWheelError> {
-    click("4")
-}
-
-pub fn scrolldown() -> Result<(), HWheelError> {
-    click("5")
-}
-
 pub fn moveto(y: usize, x: usize) -> Result<(), HWheelError> {
     let mut c = Command::new("xdotool"); // sigh, forced bindings
 

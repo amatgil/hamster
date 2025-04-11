@@ -1,7 +1,7 @@
 mod overlay;
 use std::env::args;
 
-use hamsterwheel::{click, moveto, scrolldown, scrollup, HWheelError};
+use hamsterwheel::{click, moveto, HWheelError};
 use overlay::bring_up_overlay;
 
 fn main() -> Result<(), HWheelError> {
@@ -10,8 +10,8 @@ fn main() -> Result<(), HWheelError> {
     };
     match &*arg {
         "overlay" => bring_up_overlay()?,
-        "scrollup" => scrollup()?,
-        "scrolldown" => scrolldown()?,
+        "scrollup" => click("4")?,
+        "scrolldown" => click("5")?,
         "click" => {
             let b = args().nth(2).ok_or(HWheelError::NoClickButton)?;
             // Rough check for numberiness
