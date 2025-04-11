@@ -24,7 +24,7 @@ The core of =hamster= is the deamon (=hamsterwheel=): it waits for commands sent
 *** The Overlay
 - Press =Esc= to close it
 - Press the two keys corresponding to the cell to move the mouse to its center.
-- Press =L= to lock the overlay (it won't go away after moving the mouse). Not that you cannot click through the overlay because mouse passsthrough apparently dosen't exist. This will make the selected cell, if any, recursively give more options for more cliking precision.
+- Press =Space= to click in the center of the cell, or continue to press the corresponding keys for greating accuracy.
 
 ** Demo
 TODO
