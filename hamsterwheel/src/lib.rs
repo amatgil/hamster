@@ -15,10 +15,8 @@ pub const HAMSTER_BACKGROUND: Color = Color {
     a: 0,
 };
 
-/// Elements per row
 pub const GRID_HEIGHT: i32 = 13;
-/// Elements per column
-pub const GRID_WIDTH: i32 = 13;
+pub const GRID_WIDTH: i32 = 10;
 
 pub const CHILD_GAP: f32 = 2.5;
 

@@ -1,3 +1,5 @@
+use std::default;
+
 use hamsterwheel::{
     HWheelError, CHILD_GAP, FONT_SIZE, GRID_HEIGHT, GRID_WIDTH, HAMSTER_BACKGROUND,
     HAMSTER_OPACITY, PADDING_H, PADDING_W, TARGET_FPS, TEXT_COLOR,
@@ -5,9 +7,18 @@ use hamsterwheel::{
 use raylib::prelude::*;
 
 #[derive(Debug, Default)]
+enum OverlayKind {
+    /// When it's first opened up and we're selecting the region
+    #[default]
+    Selecting,
+    /// After a region is selected, if we want to specify.
+    Specifying,
+}
+
+#[derive(Debug, Default)]
 struct OverlayState {
     is_locked: bool,
-    pressed_seq: Vec<char>,
+    kind: OverlayKind,
 }
 
 pub fn bring_up_overlay() -> Result<(), HWheelError> {
@@ -69,7 +80,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
             for j in 0..GRID_WIDTH {
                 d.draw_text(
                     // TODO: figure out which keys to show
-                    &keys[0][0].to_string(),
+                    &keys[0][j as usize].to_string(),
                     j * cell_width + PADDING_W + font_size / 4,
                     i * cell_height + PADDING_H,
                     font_size,
