@@ -4,6 +4,12 @@ use hamsterwheel::{
 };
 use raylib::prelude::*;
 
+#[derive(Debug, Default)]
+struct OverlayState {
+    is_locked: bool,
+    pressed_seq: Vec<char>,
+}
+
 pub fn bring_up_overlay() -> Result<(), HWheelError> {
     let keys = [
         vec!['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
@@ -20,12 +26,18 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
     rl.set_exit_key(Some(KeyboardKey::KEY_ESCAPE));
     rl.set_target_fps(TARGET_FPS);
 
+    let mut state = OverlayState::default();
     while !rl.window_should_close() {
         let curr_mon = get_current_monitor();
         let (mon_w, mon_h) = (get_monitor_width(curr_mon), get_monitor_height(curr_mon));
 
         let cell_width = mon_w / GRID_WIDTH;
         let cell_height = mon_h / GRID_HEIGHT;
+
+        if rl.is_key_pressed(KeyboardKey::KEY_L) {
+            state.is_locked = !state.is_locked;
+            dbg!("L");
+        }
 
         let mut d = rl.begin_drawing(&thread);
 
@@ -55,6 +67,16 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
             FONT_SIZE,
             TEXT_COLOR,
         );
+
+        if state.is_locked {
+            d.draw_text(
+                "LOCKED",
+                PADDING_W / 2,
+                mon_h - FONT_SIZE,
+                FONT_SIZE,
+                TEXT_COLOR,
+            );
+        }
     }
     Ok(())
 }
