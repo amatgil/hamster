@@ -87,7 +87,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                         .unwrap_or('?')
                         .to_uppercase()
                         .to_string(),
-                    j * cell_width + PADDING_W + 3 * font_size / 4,
+                    j * cell_width + PADDING_W + font_size,
                     i * cell_height + PADDING_H,
                     font_size,
                     TEXT_COLOR,

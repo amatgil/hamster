@@ -8,12 +8,12 @@ mod keys;
 pub use keys::*;
 use raylib::prelude::*;
 
-pub const HAMSTER_OPACITY: f32 = 0.35;
+pub const HAMSTER_OPACITY: f32 = 0.40;
 pub const HAMSTER_BACKGROUND: Color = Color {
     // TODO: Make this look good
-    r: 62,
-    g: 176,
-    b: 60,
+    r: 250,
+    g: 179,
+    b: 135,
     a: 0,
 };
 
