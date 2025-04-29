@@ -1,11 +1,9 @@
-use std::{cell::OnceCell, default};
-
 use hamsterwheel::{
-    HWheelError, KeyDistribution, CHILD_GAP, FONT_SIZE, GRID_HEIGHT, GRID_WIDTH,
-    HAMSTER_BACKGROUND, HAMSTER_OPACITY, LOCKED_RECT_COLOR, LOCKED_RECT_SIDE, PADDING_H, PADDING_W,
-    TARGET_FPS, TEXT_COLOR,
+    HWheelError, KeyDistribution, CHILD_GAP, GRID_HEIGHT, GRID_WIDTH, HAMSTER_BACKGROUND,
+    HAMSTER_OPACITY, LOCKED_RECT_COLOR, LOCKED_RECT_SIDE, PADDING_H, PADDING_W, TARGET_FPS,
+    TEXT_COLOR,
 };
-use raylib::{ffi::SetConfigFlags, prelude::*};
+use raylib::prelude::*;
 
 const KEYS: KeyDistribution<{ GRID_WIDTH as usize }> = KeyDistribution::new(
     ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
