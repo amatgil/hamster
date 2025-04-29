@@ -30,6 +30,9 @@ pub const TEXT_COLOR: Color = Color::BLACK;
 
 pub const TARGET_FPS: u32 = 20;
 
+pub const LOCKED_RECT_COLOR: Color = Color::BLUE;
+pub const LOCKED_RECT_SIDE: i32 = 30;
+
 #[derive(Debug)]
 pub enum HWheelError {
     ForgotArgument,

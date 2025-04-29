@@ -2,9 +2,10 @@ use std::{cell::OnceCell, default};
 
 use hamsterwheel::{
     HWheelError, KeyDistribution, CHILD_GAP, FONT_SIZE, GRID_HEIGHT, GRID_WIDTH,
-    HAMSTER_BACKGROUND, HAMSTER_OPACITY, PADDING_H, PADDING_W, TARGET_FPS, TEXT_COLOR,
+    HAMSTER_BACKGROUND, HAMSTER_OPACITY, LOCKED_RECT_COLOR, LOCKED_RECT_SIDE, PADDING_H, PADDING_W,
+    TARGET_FPS, TEXT_COLOR,
 };
-use raylib::prelude::*;
+use raylib::{ffi::SetConfigFlags, prelude::*};
 
 const KEYS: KeyDistribution<{ GRID_WIDTH as usize }> = KeyDistribution::new(
     ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
@@ -36,15 +37,19 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
     rl.set_exit_key(Some(KeyboardKey::KEY_ESCAPE));
     rl.set_target_fps(TARGET_FPS);
 
+    let curr_mon = get_current_monitor();
+    let (mon_w, mon_h) = (get_monitor_width(curr_mon), get_monitor_height(curr_mon));
+
+    let cell_width = mon_w / GRID_WIDTH;
+    let cell_height = mon_h / GRID_HEIGHT;
+    let font_size = cell_height;
+
+    let uiua386 = rl
+        .load_font_ex(&thread, "../assets/Uiua386.ttf", cell_height, None)
+        .expect("could not find uiua386");
+
     let mut state = OverlayState::default();
     while !rl.window_should_close() {
-        let curr_mon = get_current_monitor();
-        let (mon_w, mon_h) = (get_monitor_width(curr_mon), get_monitor_height(curr_mon));
-
-        let cell_width = mon_w / GRID_WIDTH;
-        let cell_height = mon_h / GRID_HEIGHT;
-        let font_size = cell_height;
-
         if rl.is_key_pressed(KeyboardKey::KEY_L) {
             state.is_locked = !state.is_locked;
         }
@@ -72,36 +77,43 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
 
         for i in 0..GRID_HEIGHT {
             for j in 0..GRID_WIDTH {
-                d.draw_text(
+                d.draw_text_ex(
+                    &uiua386,
                     // TODO: figure out which keys to show
                     &KEYS.get(0, j).unwrap_or('?').to_uppercase().to_string(),
-                    j * cell_width + PADDING_W + font_size / 4,
-                    i * cell_height + PADDING_H,
-                    font_size,
+                    Vector2::new(
+                        (j * cell_width + PADDING_W + font_size / 4) as f32,
+                        (i * cell_height + PADDING_H) as f32,
+                    ),
+                    font_size as f32,
+                    0.0,
                     TEXT_COLOR,
                 );
-                let skey_y = if i % 2 == 0 { 1 } else { 2 };
-                d.draw_text(
+                d.draw_text_ex(
+                    &uiua386,
                     &KEYS
-                        .get(skey_y, i / 2)
+                        .get(i % 2 + 1, i / 2)
                         .unwrap_or('?')
                         .to_uppercase()
                         .to_string(),
-                    j * cell_width + PADDING_W + font_size,
-                    i * cell_height + PADDING_H,
-                    font_size,
+                    Vector2::new(
+                        (j * cell_width + PADDING_W + 3 * font_size / 4) as f32,
+                        (i * cell_height + PADDING_H) as f32,
+                    ),
+                    font_size as f32,
+                    0.0,
                     TEXT_COLOR,
                 );
             }
         }
 
         if state.is_locked {
-            d.draw_text(
-                "LOCKED",
-                PADDING_W / 2,
-                mon_h - FONT_SIZE,
-                FONT_SIZE,
-                TEXT_COLOR,
+            d.draw_rectangle(
+                0,
+                mon_h - LOCKED_RECT_SIDE,
+                LOCKED_RECT_SIDE,
+                LOCKED_RECT_SIDE,
+                LOCKED_RECT_COLOR,
             );
         }
     }
