@@ -80,13 +80,14 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                     font_size,
                     TEXT_COLOR,
                 );
+                let skey_y = if i % 2 == 0 { 1 } else { 2 };
                 d.draw_text(
                     &KEYS
-                        .get(1, (j + i) % GRID_WIDTH)
+                        .get(skey_y, i / 2)
                         .unwrap_or('?')
                         .to_uppercase()
                         .to_string(),
-                    j * cell_width + PADDING_W + FONT_SIZE,
+                    j * cell_width + PADDING_W + 3 * font_size / 4,
                     i * cell_height + PADDING_H,
                     font_size,
                     TEXT_COLOR,

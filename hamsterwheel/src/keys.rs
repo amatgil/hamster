@@ -41,6 +41,10 @@ impl<const MAXLEN: usize> KeyDistribution<MAXLEN> {
     pub const fn get(&self, row: i32, col: i32) -> Option<char> {
         assert!(row >= 0 && col >= 0);
         let (row, col) = (row as usize, col as usize);
-        self.keys[row][col]
+        if row >= 3 || col >= MAXLEN {
+            None
+        } else {
+            self.keys[row][col]
+        }
     }
 }
