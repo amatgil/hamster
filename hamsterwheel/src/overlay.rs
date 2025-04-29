@@ -74,15 +74,19 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
             for j in 0..GRID_WIDTH {
                 d.draw_text(
                     // TODO: figure out which keys to show
-                    &KEYS.get(0, j).unwrap_or('?').to_string(),
+                    &KEYS.get(0, j).unwrap_or('?').to_uppercase().to_string(),
                     j * cell_width + PADDING_W + font_size / 4,
                     i * cell_height + PADDING_H,
                     font_size,
                     TEXT_COLOR,
                 );
                 d.draw_text(
-                    &KEYS.get(1, (j + i) % GRID_WIDTH).unwrap_or('?').to_string(),
-                    j * cell_width + PADDING_W + 3 * font_size / 4,
+                    &KEYS
+                        .get(1, (j + i) % GRID_WIDTH)
+                        .unwrap_or('?')
+                        .to_uppercase()
+                        .to_string(),
+                    j * cell_width + PADDING_W + FONT_SIZE,
                     i * cell_height + PADDING_H,
                     font_size,
                     TEXT_COLOR,
