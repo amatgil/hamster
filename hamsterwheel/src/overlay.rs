@@ -100,8 +100,16 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                 let mut d = rl.begin_drawing(&thread);
                 d.clear_background(HAMSTER_BACKGROUND);
 
+                let testing_recursion_level = 2;
                 draw_grid_lines(&mut d, cell_height, mon_w, cell_width, mon_h);
-                draw_smaller_grid_lines(&mut d, cell_height, cell_y, cell_width, cell_x);
+                draw_smaller_grid_lines(
+                    &mut d,
+                    cell_height,
+                    cell_y,
+                    cell_width,
+                    cell_x,
+                    testing_recursion_level,
+                );
                 draw_smaller_grid_letters(
                     &mut d,
                     &uiua386,
@@ -110,7 +118,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                     cell_y,
                     cell_x,
                     font_size,
-                    2,
+                    testing_recursion_level,
                 );
             }
         }
@@ -185,26 +193,29 @@ fn draw_smaller_grid_lines(
     base_cell_y: i32,
     cell_width: i32,
     base_cell_x: i32,
+    recursion_level: i32,
 ) {
+    let s = 3i32.pow(recursion_level as u32);
+
     let base_y = base_cell_y * cell_height;
     let base_x = base_cell_x * cell_width;
-    for dx in 0..=3 {
+    for delta in 0..=3 {
+        let bx = base_x + cell_width / s * delta;
+        let by = base_y + cell_height / s * delta;
         d.draw_line_ex(
-            Vector2::new((base_x + cell_width / 3 * dx) as f32, base_y as f32),
+            Vector2::new(bx as f32, base_y as f32),
             Vector2::new(
-                (base_x + cell_width / 3 * dx) as f32,
-                (base_y + cell_height) as f32,
+                bx as f32,
+                (base_y + cell_height / 3i32.pow(recursion_level as u32 - 1)) as f32,
             ),
             CHILD_GAP,
             Color::BLACK,
         );
-    }
-    for dy in 0..3 {
         d.draw_line_ex(
-            Vector2::new(base_x as f32, (base_y + cell_height / 3 * dy) as f32),
+            Vector2::new(base_x as f32, by as f32),
             Vector2::new(
-                (base_x + cell_width) as f32,
-                (base_y + cell_height / 3 * dy) as f32,
+                (base_x + cell_width / 3i32.pow(recursion_level as u32 - 1)) as f32,
+                by as f32,
             ),
             CHILD_GAP,
             Color::BLACK,
