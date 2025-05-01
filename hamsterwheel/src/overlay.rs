@@ -13,12 +13,13 @@ const KEYS: KeyDistribution<{ GRID_WIDTH as usize }> = KeyDistribution::new(
     ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '-'],
 );
 
+const SPECIAL_KEYS: [char; 1] = [' '];
+
 #[derive(Debug)]
 enum OverlayState {
     /// When it's first opened up and we're selecting the region
     Selecting { key_seq: Vec<char> },
-    /// After a region is selected, if we want to specify.
-    /// Only available if it's locked
+    /// After a region is selected, for further specification
     Specifying {
         cell_y: i32,
         cell_x: i32,
@@ -63,7 +64,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
 
         match state {
             OverlayState::Selecting { ref mut key_seq } => {
-                if let Some(key) = rl.get_char_pressed().filter(|k| ![' '].contains(k)) {
+                if let Some(key) = rl.get_char_pressed().filter(|k| !SPECIAL_KEYS.contains(k)) {
                     key_seq.push(key);
                 }
                 let mut d = rl.begin_drawing(&thread);
@@ -102,8 +103,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                 ref mut spec_key_seq,
                 ref mut len_of_last_move,
             } => {
-                if let Some(key) = rl.get_char_pressed().filter(|k| ![' '].contains(k)) {
-                    dbg!(key);
+                if let Some(key) = rl.get_char_pressed().filter(|k| !SPECIAL_KEYS.contains(k)) {
                     spec_key_seq.push(key);
                 }
                 let mut d = rl.begin_drawing(&thread);
