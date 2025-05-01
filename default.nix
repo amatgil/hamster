@@ -1,6 +1,5 @@
 {
-  pkgs ? import <nixpkgs> { },
-  lib
+  pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") {}
 }:
 let
   manifest = (pkgs.lib.importTOML ./Cargo.toml).package;
