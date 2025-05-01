@@ -23,6 +23,9 @@ enum OverlayState {
         cell_y: i32,
         cell_x: i32,
         spec_key_seq: Vec<char>,
+        /// To avoid repeatedly moving, only move when the lengths change.
+        /// We must, then, store the last one
+        len_of_last_move: Option<usize>,
     },
 }
 
@@ -60,7 +63,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
 
         match state {
             OverlayState::Selecting { ref mut key_seq } => {
-                if let Some(key) = rl.get_char_pressed().filter(|k| !['l', ' '].contains(k)) {
+                if let Some(key) = rl.get_char_pressed().filter(|k| ![' '].contains(k)) {
                     key_seq.push(key);
                 }
                 let mut d = rl.begin_drawing(&thread);
@@ -86,6 +89,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                                 cell_y: y_window,
                                 cell_x: x_window,
                                 spec_key_seq: vec![],
+                                len_of_last_move: None,
                             };
                         }
                         _ => unreachable!("Error in draw_grid_letters, probably"),
@@ -95,12 +99,16 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
             OverlayState::Specifying {
                 cell_y,
                 cell_x,
-                ref spec_key_seq,
+                ref mut spec_key_seq,
+                ref mut len_of_last_move,
             } => {
+                if let Some(key) = rl.get_char_pressed().filter(|k| ![' '].contains(k)) {
+                    dbg!(key);
+                    spec_key_seq.push(key);
+                }
                 let mut d = rl.begin_drawing(&thread);
                 d.clear_background(HAMSTER_BACKGROUND);
 
-                let testing_recursion_level = 2;
                 draw_grid_lines(&mut d, cell_height, mon_w, cell_width, mon_h);
                 draw_smaller_grid_lines(
                     &mut d,
@@ -108,9 +116,9 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                     cell_y,
                     cell_width,
                     cell_x,
-                    testing_recursion_level,
+                    spec_key_seq.len() as i32 + 1,
                 );
-                draw_smaller_grid_letters(
+                let moveto_dest = draw_smaller_grid_letters(
                     &mut d,
                     &uiua386,
                     cell_width,
@@ -118,8 +126,18 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                     cell_y,
                     cell_x,
                     font_size,
-                    testing_recursion_level,
+                    spec_key_seq.last().copied(),
+                    spec_key_seq.len() as i32 + 1,
                 );
+
+                if let Some((y, x)) = moveto_dest {
+                    if len_of_last_move.is_none()
+                        || len_of_last_move.is_some_and(|l| l != spec_key_seq.len())
+                    {
+                        *len_of_last_move = len_of_last_move.map_or(Some(0), |l| Some(l + 1));
+                        moveto(y as usize, x as usize)?;
+                    }
+                }
             }
         }
     }
@@ -230,8 +248,10 @@ fn draw_smaller_grid_letters(
     grid_y: i32,
     grid_x: i32,
     font_size: i32,
+    last_pressed: Option<char>,
     recursion_level: i32,
-) {
+) -> Option<(i32, i32)> {
+    let mut ret = None;
     let s = 3i32.pow(recursion_level as u32);
     let font_size = font_size / (2 * recursion_level);
 
@@ -242,10 +262,16 @@ fn draw_smaller_grid_letters(
             }
             let text_x = grid_x * cell_width + j * cell_width / s + cell_width / s / 2;
             let text_y = grid_y * cell_height + i * cell_height / s - cell_height / s / 2;
+            let key_text = KEYS.get(i, j + 5).unwrap_or('?');
+            if let Some(last) = last_pressed {
+                if key_text == last {
+                    ret = Some((text_y, text_x))
+                }
+            }
 
             d.draw_text_ex(
                 uiua386,
-                &KEYS.get(i, j + 5).unwrap_or('?').to_string(),
+                &key_text.to_string(),
                 Vector2::new(text_x as f32, text_y as f32),
                 font_size as f32,
                 0.0,
@@ -253,6 +279,7 @@ fn draw_smaller_grid_letters(
             )
         }
     }
+    ret
 }
 
 fn draw_grid_lines(
