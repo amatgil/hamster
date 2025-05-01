@@ -77,7 +77,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                     cell_width,
                     font_size,
                     cell_height,
-                    &key_seq,
+                    key_seq,
                 );
                 if key_seq.len() == 2 {
                     match moveto_dest {
@@ -142,7 +142,6 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
         }
     }
 
-    std::mem::drop(thread);
     std::mem::drop(rl); // TODO: This segfaults when main's scope ends. Fix
     sleep(Duration::from_millis(20));
     if let Some(c) = queued_up_click {
@@ -312,7 +311,7 @@ fn is_prefix_of(needle: &[char], haystack: &[char]) -> bool {
         false
     } else {
         for i in 0..needle.len() {
-            if needle[i].to_ascii_uppercase() != haystack[i].to_ascii_uppercase() {
+            if !needle[i].eq_ignore_ascii_case(&haystack[i]) {
                 return false;
             }
         }
