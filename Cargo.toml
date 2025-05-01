@@ -2,6 +2,7 @@
 name = "hamster"
 version = "0.1.0"
 edition = "2024"
+description = "A simple mouse replacement based on the keyboard's grid layout"
 
 [dependencies]
 raylib = "5.5.1"
