@@ -13,20 +13,17 @@ const KEYS: KeyDistribution<{ GRID_WIDTH as usize }> = KeyDistribution::new(
     ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '-'],
 );
 
-#[derive(Debug, Default)]
-enum OverlayKind {
+#[derive(Debug)]
+enum OverlayState {
     /// When it's first opened up and we're selecting the region
-    #[default]
-    Selecting,
+    Selecting { key_seq: Vec<char> },
     /// After a region is selected, if we want to specify.
     /// Only available if it's locked
-    Specifying { cell_y: i32, cell_x: i32 },
-}
-
-#[derive(Debug, Default)]
-struct OverlayState {
-    kind: OverlayKind,
-    key_seq: Vec<char>,
+    Specifying {
+        cell_y: i32,
+        cell_x: i32,
+        spec_key_seq: Vec<char>,
+    },
 }
 
 pub fn bring_up_overlay() -> Result<(), HWheelError> {
@@ -48,11 +45,12 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
         .load_font_ex(&thread, "../assets/Uiua386.ttf", cell_height, None)
         .expect("could not find uiua386");
 
-    let mut state = OverlayState::default();
+    let mut state = OverlayState::Selecting { key_seq: vec![] };
 
     let mut queued_up_click = None;
     while !rl.window_should_close() {
         if rl.is_key_pressed(KeyboardKey::KEY_SPACE) {
+            // It's queued up because the click must occur after the overlay closes
             queued_up_click = Some(match rl.is_key_pressed(KeyboardKey::KEY_LEFT_SHIFT) {
                 false => "1",
                 true => "3",
@@ -60,47 +58,57 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
             break;
         }
 
-        if let Some(key) = rl.get_char_pressed().filter(|k| !['l', ' '].contains(k)) {
-            state.key_seq.push(key);
-        }
+        match state {
+            OverlayState::Selecting { ref mut key_seq } => {
+                if let Some(key) = rl.get_char_pressed().filter(|k| !['l', ' '].contains(k)) {
+                    key_seq.push(key);
+                }
+                let mut d = rl.begin_drawing(&thread);
+                d.clear_background(HAMSTER_BACKGROUND);
 
-        let mut d = rl.begin_drawing(&thread);
-        d.clear_background(HAMSTER_BACKGROUND);
-
-        draw_grid_lines(&mut d, cell_height, mon_w, cell_width, mon_h);
-        let moveto_dest = draw_grid_letters(
-            &mut d,
-            &uiua386,
-            cell_width,
-            font_size,
-            cell_height,
-            &state.key_seq,
-        );
-        if state.key_seq.len() == 2 {
-            if let Some((y_window, x_window)) = moveto_dest {
-                moveto(
-                    (y_window * cell_height + cell_height / 2) as usize,
-                    (x_window * cell_width + cell_width / 2) as usize,
-                )?;
-                state.kind = OverlayKind::Specifying {
-                    cell_y: y_window,
-                    cell_x: x_window,
-                };
-            } else {
-                unreachable!("WHOOPS");
+                draw_grid_lines(&mut d, cell_height, mon_w, cell_width, mon_h);
+                let moveto_dest = draw_grid_letters(
+                    &mut d,
+                    &uiua386,
+                    cell_width,
+                    font_size,
+                    cell_height,
+                    &key_seq,
+                );
+                if key_seq.len() == 2 {
+                    if let Some((y_window, x_window)) = moveto_dest {
+                        moveto(
+                            (y_window * cell_height + cell_height / 2) as usize,
+                            (x_window * cell_width + cell_width / 2) as usize,
+                        )?;
+                        state = OverlayState::Specifying {
+                            cell_y: y_window,
+                            cell_x: x_window,
+                            spec_key_seq: vec![],
+                        };
+                    } else {
+                        unreachable!("WHOOPS");
+                    }
+                }
             }
-        }
-
-        if let OverlayKind::Specifying { cell_y, cell_x } = state.kind {
-            draw_smaller_grid_letters(
-                &mut d,
-                &uiua386,
-                cell_width,
-                cell_height,
+            OverlayState::Specifying {
                 cell_y,
                 cell_x,
-                font_size,
-            );
+                ref spec_key_seq,
+            } => {
+                let mut d = rl.begin_drawing(&thread);
+                d.clear_background(HAMSTER_BACKGROUND);
+
+                draw_smaller_grid_letters(
+                    &mut d,
+                    &uiua386,
+                    cell_width,
+                    cell_height,
+                    cell_y,
+                    cell_x,
+                    font_size,
+                );
+            }
         }
     }
 
