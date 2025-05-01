@@ -105,7 +105,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                                 len_of_last_move: None,
                             };
                         }
-                        _ => unreachable!("Error in draw_grid_letters, probably"),
+                        _ => unreachable!("FATAL: Error in draw_grid_letters, probably"),
                     }
                 }
             }
@@ -115,9 +115,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                 ref mut spec_key_seq,
                 ref mut len_of_last_move,
             } => {
-                if let Some(key) = rl.get_char_pressed().filter(|k| !SPECIAL_KEYS.contains(k)) {
-                    spec_key_seq.push(key);
-                }
+                let last_pressed = rl.get_char_pressed().filter(|k| !SPECIAL_KEYS.contains(k));
 
                 let mut d = rl.begin_drawing(&thread);
                 d.clear_background(HAMSTER_BACKGROUND);
@@ -139,7 +137,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                     cell_y,
                     cell_x,
                     font_size,
-                    spec_key_seq.last().copied(),
+                    last_pressed,
                     spec_key_seq.len() as i32 + 1,
                 );
 
@@ -148,9 +146,11 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                         || len_of_last_move.is_some_and(|l| l != spec_key_seq.len())
                     {
                         *len_of_last_move = len_of_last_move.map_or(Some(0), |l| Some(l + 1));
-                        dbg!(y, x);
                         moveto(y as usize, x as usize)?;
                     }
+                }
+                if let Some(key) = last_pressed {
+                    spec_key_seq.push(key);
                 }
             }
         }
@@ -286,8 +286,7 @@ fn draw_smaller_grid_letters(
                 TEXT_COLOR,
             );
             if last_pressed.is_some_and(|l| l == key_text) {
-                dbg!(key_text, text_y, text_x);
-                ret = Some((text_y, text_x))
+                ret = Some((text_y + font_size / recursion_level / 2, text_x))
             }
         }
     }
