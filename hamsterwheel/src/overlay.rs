@@ -25,7 +25,6 @@ enum OverlayKind {
 
 #[derive(Debug, Default)]
 struct OverlayState {
-    is_locked: bool,
     kind: OverlayKind,
     key_seq: Vec<char>,
 }
@@ -55,9 +54,6 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
 
     let mut queued_up_click = None;
     while !rl.window_should_close() {
-        if rl.is_key_pressed(KeyboardKey::KEY_L) {
-            state.is_locked = !state.is_locked;
-        }
         if rl.is_key_pressed(KeyboardKey::KEY_SPACE) {
             queued_up_click = Some(match rl.is_key_pressed(KeyboardKey::KEY_LEFT_SHIFT) {
                 false => "1",
@@ -82,7 +78,6 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
             cell_height,
             &state.key_seq,
         );
-        draw_locked_indicator(&state, d, mon_h);
 
         if state.is_locked {
             // TODO
@@ -107,18 +102,6 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
         click(c)?;
     }
     Ok(())
-}
-
-fn draw_locked_indicator(state: &OverlayState, mut d: RaylibDrawHandle, mon_h: i32) {
-    if state.is_locked {
-        d.draw_rectangle(
-            0,
-            mon_h - LOCKED_RECT_SIDE,
-            LOCKED_RECT_SIDE,
-            LOCKED_RECT_SIDE,
-            LOCKED_RECT_COLOR,
-        );
-    }
 }
 
 fn keyseq_associated_to_cell(i: i32, j: i32) -> [char; 2] {
