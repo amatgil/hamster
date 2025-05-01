@@ -1,5 +1,6 @@
 {
   pkgs ? import <nixpkgs> { },
+  lib
 }:
 let
   manifest = (pkgs.lib.importTOML ./Cargo.toml).package;
@@ -15,9 +16,13 @@ let
     pkgs.xorg.libXi
     pkgs.xorg.libXinerama
     pkgs.xorg.libXrandr
+
+    pkgs.llvmPackages.libclang
+    pkgs.llvmPackages.libcxxClang
+    pkgs.clang
 ];
 in
-pkgs.rustPlatform.buildRustPackage {
+pkgs.rustPlatform.buildRustPackage rec {
   pname = manifest.name;
   version = manifest.version;
   cargoHash = pkgs.lib.fakeHash;
@@ -26,5 +31,12 @@ pkgs.rustPlatform.buildRustPackage {
   meta.description = manifest.description ? null;
 
   nativeBuildInputs = packages;
-  BuildInputs = packages;
+  buildInputs = packages;
+
+  LIBCLANG_PATH = with pkgs; "${llvmPackages.libclang.lib}/lib";
+  BINDGEN_EXTRA_CLANG_ARGS =
+    with pkgs;
+    "-isystem ${llvmPackages.libclang.lib}/lib/clang/${lib.versions.major (lib.getVersion clang)}/include";
+
+
 }
