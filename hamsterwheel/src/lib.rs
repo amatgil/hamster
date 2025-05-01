@@ -20,7 +20,7 @@ pub const HAMSTER_BACKGROUND: Color = Color {
 pub const GRID_HEIGHT: i32 = 13;
 pub const GRID_WIDTH: i32 = 10;
 
-pub const CHILD_GAP: f32 = 2.5;
+pub const CHILD_GAP: f32 = 2.5; // Line thickness
 
 pub const PADDING_W: i32 = 0;
 pub const PADDING_H: i32 = 0;

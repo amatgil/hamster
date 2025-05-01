@@ -76,18 +76,19 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                     &key_seq,
                 );
                 if key_seq.len() == 2 {
-                    if let Some((y_window, x_window)) = moveto_dest {
-                        moveto(
-                            (y_window * cell_height + cell_height / 2) as usize,
-                            (x_window * cell_width + cell_width / 2) as usize,
-                        )?;
-                        state = OverlayState::Specifying {
-                            cell_y: y_window,
-                            cell_x: x_window,
-                            spec_key_seq: vec![],
-                        };
-                    } else {
-                        unreachable!("WHOOPS");
+                    match moveto_dest {
+                        Some((y_window, x_window)) => {
+                            moveto(
+                                (y_window * cell_height + cell_height / 2) as usize,
+                                (x_window * cell_width + cell_width / 2) as usize,
+                            )?;
+                            state = OverlayState::Specifying {
+                                cell_y: y_window,
+                                cell_x: x_window,
+                                spec_key_seq: vec![],
+                            };
+                        }
+                        _ => unreachable!("Error in draw_grid_letters, probably"),
                     }
                 }
             }
@@ -99,6 +100,8 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                 let mut d = rl.begin_drawing(&thread);
                 d.clear_background(HAMSTER_BACKGROUND);
 
+                draw_grid_lines(&mut d, cell_height, mon_w, cell_width, mon_h);
+                draw_smaller_grid_lines(&mut d, cell_height, cell_y, cell_width, cell_x);
                 draw_smaller_grid_letters(
                     &mut d,
                     &uiua386,
@@ -107,6 +110,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                     cell_y,
                     cell_x,
                     font_size,
+                    2,
                 );
             }
         }
@@ -175,6 +179,38 @@ fn draw_grid_letters(
     moveto_dest
 }
 
+fn draw_smaller_grid_lines(
+    d: &mut RaylibDrawHandle,
+    cell_height: i32,
+    base_cell_y: i32,
+    cell_width: i32,
+    base_cell_x: i32,
+) {
+    let base_y = base_cell_y * cell_height;
+    let base_x = base_cell_x * cell_width;
+    for dx in 0..=3 {
+        d.draw_line_ex(
+            Vector2::new((base_x + cell_width / 3 * dx) as f32, base_y as f32),
+            Vector2::new(
+                (base_x + cell_width / 3 * dx) as f32,
+                (base_y + cell_height) as f32,
+            ),
+            CHILD_GAP,
+            Color::BLACK,
+        );
+    }
+    for dy in 0..3 {
+        d.draw_line_ex(
+            Vector2::new(base_x as f32, (base_y + cell_height / 3 * dy) as f32),
+            Vector2::new(
+                (base_x + cell_width) as f32,
+                (base_y + cell_height / 3 * dy) as f32,
+            ),
+            CHILD_GAP,
+            Color::BLACK,
+        );
+    }
+}
 fn draw_smaller_grid_letters(
     d: &mut RaylibDrawHandle,
     uiua386: &Font,
@@ -183,19 +219,23 @@ fn draw_smaller_grid_letters(
     grid_y: i32,
     grid_x: i32,
     font_size: i32,
+    recursion_level: i32,
 ) {
+    let s = 3i32.pow(recursion_level as u32);
+    let font_size = font_size / (2 * recursion_level);
+
     for i in 0..3 {
         for j in 0..3 {
             if i == 1 && j == 1 {
                 continue;
             }
+            let text_x = grid_x * cell_width + j * cell_width / s + cell_width / s / 2;
+            let text_y = grid_y * cell_height + i * cell_height / s - cell_height / s / 2;
+
             d.draw_text_ex(
                 uiua386,
                 &KEYS.get(i, j + 5).unwrap_or('?').to_string(),
-                Vector2::new(
-                    ((grid_x + j) * cell_width) as f32,
-                    ((grid_y + i) * cell_height) as f32,
-                ),
+                Vector2::new(text_x as f32, text_y as f32),
                 font_size as f32,
                 0.0,
                 TEXT_COLOR,
