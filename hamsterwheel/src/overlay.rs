@@ -20,9 +20,10 @@ enum OverlayState {
     /// When it's first opened up and we're selecting the region
     Selecting { key_seq: Vec<char> },
     /// After a region is selected, for further specification
+    /// the base_{y, x} args are in absolute coordinates, no in cells, because they also indicate subcells (and subsubcells, etc.)
     Specifying {
-        cell_y: i32,
-        cell_x: i32,
+        base_y: i32,
+        base_x: i32,
         spec_key_seq: Vec<char>,
         /// To avoid repeatedly moving, only move when the lengths change.
         /// We must, then, store the last one
@@ -99,8 +100,8 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                                 (x_window * cell_width + cell_width / 2) as usize,
                             )?;
                             state = OverlayState::Specifying {
-                                cell_y: y_window,
-                                cell_x: x_window,
+                                base_y: y_window * cell_height,
+                                base_x: x_window * cell_width,
                                 spec_key_seq: vec![],
                                 len_of_last_move: None,
                             };
@@ -110,12 +111,13 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                 }
             }
             OverlayState::Specifying {
-                cell_y,
-                cell_x,
+                ref mut base_y,
+                ref mut base_x,
                 ref mut spec_key_seq,
                 ref mut len_of_last_move,
             } => {
                 let last_pressed = rl.get_char_pressed().filter(|k| !SPECIAL_KEYS.contains(k));
+                let rec_level = spec_key_seq.len() as i32 + 1;
 
                 let mut d = rl.begin_drawing(&thread);
                 d.clear_background(HAMSTER_BACKGROUND);
@@ -124,21 +126,21 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                 draw_smaller_grid_lines(
                     &mut d,
                     cell_height,
-                    cell_y,
+                    *base_y,
                     cell_width,
-                    cell_x,
-                    spec_key_seq.len() as i32 + 1,
+                    *base_x,
+                    rec_level,
                 );
                 let moveto_dest = draw_smaller_grid_letters(
                     &mut d,
                     &uiua386,
                     cell_width,
                     cell_height,
-                    cell_y,
-                    cell_x,
+                    *base_y,
+                    *base_x,
                     font_size,
                     last_pressed,
-                    spec_key_seq.len() as i32 + 1,
+                    rec_level,
                 );
 
                 if let Some((y, x)) = moveto_dest {
@@ -147,6 +149,8 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                     {
                         *len_of_last_move = len_of_last_move.map_or(Some(0), |l| Some(l + 1));
                         moveto(y as usize, x as usize)?;
+                        *base_y = y;
+                        *base_x = x;
                     }
                 }
                 if let Some(key) = last_pressed {
@@ -221,15 +225,13 @@ fn draw_grid_letters(
 fn draw_smaller_grid_lines(
     d: &mut RaylibDrawHandle,
     cell_height: i32,
-    base_cell_y: i32,
+    base_y: i32,
     cell_width: i32,
-    base_cell_x: i32,
+    base_x: i32,
     recursion_level: i32,
 ) {
     let s = 3i32.pow(recursion_level as u32);
 
-    let base_y = base_cell_y * cell_height;
-    let base_x = base_cell_x * cell_width;
     for delta in 0..=3 {
         let bx = base_x + cell_width / s * delta;
         let by = base_y + cell_height / s * delta;
@@ -258,8 +260,8 @@ fn draw_smaller_grid_letters(
     uiua386: &Font,
     cell_width: i32,
     cell_height: i32,
-    grid_y: i32,
-    grid_x: i32,
+    base_y: i32,
+    base_x: i32,
     font_size: i32,
     last_pressed: Option<char>,
     recursion_level: i32,
@@ -273,8 +275,8 @@ fn draw_smaller_grid_letters(
             if i == 1 && j == 1 {
                 continue;
             }
-            let text_x = grid_x * cell_width + j * cell_width / s + cell_width / s / 2;
-            let text_y = grid_y * cell_height + i * cell_height / s - cell_height / s / 2;
+            let text_x = base_x + j * cell_width / s + cell_width / s / 2;
+            let text_y = base_y + i * cell_height / s - cell_height / s / 2;
             let key_text = KEYS.get(i, j + 5).unwrap_or('?');
 
             d.draw_text_ex(
