@@ -108,3 +108,19 @@ pub fn moveto(y: usize, x: usize) -> Result<(), HWheelError> {
         Err(e) => Err(HWheelError::CouldNotReachXDoTool(Box::new(e))),
     }
 }
+
+pub fn moveto_relative(dy: isize, dx: isize) -> Result<(), HWheelError> {
+    let mut c = Command::new("xdotool"); // sigh, forced bindings
+
+    let c = c
+        .arg("mousemove_relative")
+        .arg("--sync")
+        .arg("--")
+        .arg(dx.to_string())
+        .arg(dy.to_string());
+
+    match c.spawn() {
+        Ok(_c) => Ok(()),
+        Err(e) => Err(HWheelError::CouldNotReachXDoTool(Box::new(e))),
+    }
+}

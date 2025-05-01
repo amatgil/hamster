@@ -1,9 +1,9 @@
 use std::{thread::sleep, time::Duration};
 
 use hamsterwheel::{
-    click, moveto, HWheelError, KeyDistribution, CHILD_GAP, GRID_HEIGHT, GRID_WIDTH,
-    HAMSTER_BACKGROUND, HAMSTER_OPACITY, LOCKED_RECT_COLOR, LOCKED_RECT_SIDE, PADDING_H, PADDING_W,
-    TARGET_FPS, TEXT_COLOR,
+    click, moveto, moveto_relative, HWheelError, KeyDistribution, CHILD_GAP, GRID_HEIGHT,
+    GRID_WIDTH, HAMSTER_BACKGROUND, HAMSTER_OPACITY, LOCKED_RECT_COLOR, LOCKED_RECT_SIDE,
+    PADDING_H, PADDING_W, TARGET_FPS, TEXT_COLOR,
 };
 use raylib::prelude::*;
 
@@ -60,6 +60,18 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                 true => "3",
             });
             break;
+        }
+
+        for (k, dy, dx) in [
+            // Not vim because the letters are already in use for grid-selection :(
+            (KeyboardKey::KEY_LEFT, 0, -10),
+            (KeyboardKey::KEY_RIGHT, 0, 10),
+            (KeyboardKey::KEY_UP, -10, 0),
+            (KeyboardKey::KEY_DOWN, 10, 0),
+        ] {
+            if rl.is_key_down(k) {
+                moveto_relative(dy, dx)?;
+            }
         }
 
         match state {
