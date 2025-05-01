@@ -20,7 +20,7 @@ enum OverlayKind {
     Selecting,
     /// After a region is selected, if we want to specify.
     /// Only available if it's locked
-    Specifying,
+    Specifying { cell_y: i32, cell_x: i32 },
 }
 
 #[derive(Debug, Default)]
@@ -76,20 +76,31 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
             cell_height,
             &state.key_seq,
         );
+        if state.key_seq.len() == 2 {
+            if let Some((y_window, x_window)) = moveto_dest {
+                moveto(
+                    (y_window * cell_height + cell_height / 2) as usize,
+                    (x_window * cell_width + cell_width / 2) as usize,
+                )?;
+                state.kind = OverlayKind::Specifying {
+                    cell_y: y_window,
+                    cell_x: x_window,
+                };
+            } else {
+                unreachable!("WHOOPS");
+            }
+        }
 
-        match state.key_seq.len() {
-            len if len == 2 => {
-                if let Some((y_window, x_window)) = moveto_dest {
-                    moveto(
-                        (y_window * cell_height + cell_height / 2) as usize,
-                        (x_window * cell_width + cell_width / 2) as usize,
-                    )?;
-                }
-            }
-            len if len > 2 => {
-                println!("len is >2: {len}");
-            }
-            _ => {}
+        if let OverlayKind::Specifying { cell_y, cell_x } = state.kind {
+            draw_smaller_grid_letters(
+                &mut d,
+                &uiua386,
+                cell_width,
+                cell_height,
+                cell_y,
+                cell_x,
+                font_size,
+            );
         }
     }
 
@@ -97,11 +108,9 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
     std::mem::drop(rl); // TODO: This segfaults when main's scope ends. Fix
     sleep(Duration::from_millis(20));
     if let Some(c) = queued_up_click {
-        println!("CLICKING BUTTON: {c}");
+        eprintln!("CLICKING BUTTON: {c}");
         click(c)?;
     }
-    println!("clicked!");
-    sleep(Duration::from_millis(2000));
     Ok(())
 }
 
@@ -156,6 +165,35 @@ fn draw_grid_letters(
         }
     }
     moveto_dest
+}
+
+fn draw_smaller_grid_letters(
+    d: &mut RaylibDrawHandle,
+    uiua386: &Font,
+    cell_width: i32,
+    cell_height: i32,
+    grid_y: i32,
+    grid_x: i32,
+    font_size: i32,
+) {
+    for i in 0..3 {
+        for j in 0..3 {
+            if i == 1 && j == 1 {
+                continue;
+            }
+            d.draw_text_ex(
+                uiua386,
+                &KEYS.get(i, j + 5).unwrap_or('?').to_string(),
+                Vector2::new(
+                    ((grid_x + j) * cell_width) as f32,
+                    ((grid_y + i) * cell_height) as f32,
+                ),
+                font_size as f32,
+                0.0,
+                TEXT_COLOR,
+            )
+        }
+    }
 }
 
 fn draw_grid_lines(
