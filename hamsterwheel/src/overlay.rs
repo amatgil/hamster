@@ -262,11 +262,6 @@ fn draw_smaller_grid_letters(
             let text_x = grid_x * cell_width + j * cell_width / s + cell_width / s / 2;
             let text_y = grid_y * cell_height + i * cell_height / s - cell_height / s / 2;
             let key_text = KEYS.get(i, j + 5).unwrap_or('?');
-            if let Some(last) = last_pressed {
-                if key_text == last {
-                    ret = Some((text_y, text_x))
-                }
-            }
 
             d.draw_text_ex(
                 uiua386,
@@ -275,7 +270,11 @@ fn draw_smaller_grid_letters(
                 font_size as f32,
                 0.0,
                 TEXT_COLOR,
-            )
+            );
+            if last_pressed.is_some_and(|l| l == key_text) {
+                dbg!(key_text);
+                ret = Some((text_y, text_x))
+            }
         }
     }
     ret
