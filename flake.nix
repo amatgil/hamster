@@ -19,5 +19,9 @@
       devShells = forAllSystems (system: {
         default = pkgs.callPackage ./shell.nix { inherit pkgs; };
       });
+      nixosModules.rust-nix-template = { pkgs, ... }:
+        {
+          nixpkgs.overlays = [ self.overlay ];
+        };
     };
 }
