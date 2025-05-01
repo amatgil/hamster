@@ -30,8 +30,6 @@ struct OverlayState {
 }
 
 pub fn bring_up_overlay() -> Result<(), HWheelError> {
-    unsafe { raylib::ffi::SetConfigFlags(ConfigFlags::FLAG_WINDOW_MOUSE_PASSTHROUGH as u32) };
-
     let (mut rl, thread) = raylib::init().title("Hamster").build();
 
     rl.set_window_opacity(HAMSTER_OPACITY);
@@ -79,10 +77,8 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
             &state.key_seq,
         );
 
-        if state.is_locked {
-            // TODO
-        } else {
-            if state.key_seq.len() == 2 {
+        match state.key_seq.len() {
+            len if len == 2 => {
                 if let Some((y_window, x_window)) = moveto_dest {
                     moveto(
                         (y_window * cell_height + cell_height / 2) as usize,
@@ -90,17 +86,22 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                     )?;
                 }
             }
+            len if len > 2 => {
+                println!("len is >2: {len}");
+            }
+            _ => {}
         }
     }
-    std::mem::drop(rl);
 
     std::mem::drop(thread);
+    std::mem::drop(rl); // TODO: This segfaults when main's scope ends. Fix
     sleep(Duration::from_millis(20));
-
     if let Some(c) = queued_up_click {
         println!("CLICKING BUTTON: {c}");
         click(c)?;
     }
+    println!("clicked!");
+    sleep(Duration::from_millis(2000));
     Ok(())
 }
 
