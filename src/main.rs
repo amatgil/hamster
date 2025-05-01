@@ -1,7 +1,7 @@
 mod overlay;
 use std::env::args;
 
-use hamsterwheel::{click, moveto, HWheelError};
+use hamster::{click, moveto, HWheelError};
 use overlay::bring_up_overlay;
 
 fn main() -> Result<(), HWheelError> {

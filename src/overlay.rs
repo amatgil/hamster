@@ -1,6 +1,6 @@
 use std::{thread::sleep, time::Duration};
 
-use hamsterwheel::{
+use hamster::{
     click, moveto, moveto_relative, HWheelError, KeyDistribution, CHILD_GAP, GRID_HEIGHT,
     GRID_WIDTH, HAMSTER_BACKGROUND, HAMSTER_OPACITY, LOCKED_RECT_COLOR, LOCKED_RECT_SIDE,
     PADDING_H, PADDING_W, TARGET_FPS, TEXT_COLOR,
@@ -47,7 +47,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
     let font_size = cell_height;
 
     let uiua386 = rl
-        .load_font_ex(&thread, "../assets/Uiua386.ttf", cell_height, None)
+        .load_font_ex(&thread, "assets/Uiua386.ttf", cell_height, None)
         .expect("could not find uiua386");
 
     let mut state = OverlayState::Selecting { key_seq: vec![] };
@@ -189,14 +189,14 @@ fn draw_grid_letters(
     let mut moveto_dest = None;
     for i in 0..GRID_HEIGHT {
         for j in 0..GRID_WIDTH {
-            let curr_keyseq = keyseq_associated_to_cell(i, j);
+            let curr_keyseq @ [left, right] = keyseq_associated_to_cell(i, j);
             if pressed_keys.is_empty() || is_prefix_of(pressed_keys, &curr_keyseq) {
                 if pressed_keys.len() == 2 {
                     moveto_dest = Some((i, j));
                 }
                 d.draw_text_ex(
                     uiua386,
-                    &curr_keyseq[0].to_string(),
+                    &left.to_string(),
                     Vector2::new(
                         (j * cell_width + PADDING_W + font_size / 4) as f32,
                         (i * cell_height + PADDING_H) as f32,
@@ -207,7 +207,7 @@ fn draw_grid_letters(
                 );
                 d.draw_text_ex(
                     uiua386,
-                    &curr_keyseq[1].to_string(),
+                    &right.to_string(),
                     Vector2::new(
                         (j * cell_width + PADDING_W + 3 * font_size / 4) as f32,
                         (i * cell_height + PADDING_H) as f32,
