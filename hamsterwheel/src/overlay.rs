@@ -143,14 +143,14 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                     rec_level,
                 );
 
-                if let Some((y, x)) = moveto_dest {
+                if let Some(((y, x), (i, j))) = moveto_dest {
                     if len_of_last_move.is_none()
                         || len_of_last_move.is_some_and(|l| l != spec_key_seq.len())
                     {
                         *len_of_last_move = len_of_last_move.map_or(Some(0), |l| Some(l + 1));
                         moveto(y as usize, x as usize)?;
-                        *base_y = y;
-                        *base_x = x;
+                        *base_y = *base_y + cell_height / 3i32.pow(rec_level as u32) * i;
+                        *base_x = *base_x + cell_width / 3i32.pow(rec_level as u32) * j;
                     }
                 }
                 if let Some(key) = last_pressed {
@@ -265,7 +265,7 @@ fn draw_smaller_grid_letters(
     font_size: i32,
     last_pressed: Option<char>,
     recursion_level: i32,
-) -> Option<(i32, i32)> {
+) -> Option<((i32, i32), (i32, i32))> {
     let mut ret = None;
     let s = 3i32.pow(recursion_level as u32);
     let font_size = font_size / (2 * recursion_level);
@@ -288,7 +288,10 @@ fn draw_smaller_grid_letters(
                 TEXT_COLOR,
             );
             if last_pressed.is_some_and(|l| l == key_text) {
-                ret = Some((text_y + font_size / recursion_level / 2, text_x))
+                ret = Some((
+                    ((text_y + font_size / (2 * recursion_level), text_x)),
+                    (i, j),
+                ))
             }
         }
     }
