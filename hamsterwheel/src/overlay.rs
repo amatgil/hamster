@@ -106,6 +106,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                 if let Some(key) = rl.get_char_pressed().filter(|k| !SPECIAL_KEYS.contains(k)) {
                     spec_key_seq.push(key);
                 }
+
                 let mut d = rl.begin_drawing(&thread);
                 d.clear_background(HAMSTER_BACKGROUND);
 
@@ -135,6 +136,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                         || len_of_last_move.is_some_and(|l| l != spec_key_seq.len())
                     {
                         *len_of_last_move = len_of_last_move.map_or(Some(0), |l| Some(l + 1));
+                        dbg!(y, x);
                         moveto(y as usize, x as usize)?;
                     }
                 }
@@ -272,7 +274,7 @@ fn draw_smaller_grid_letters(
                 TEXT_COLOR,
             );
             if last_pressed.is_some_and(|l| l == key_text) {
-                dbg!(key_text);
+                dbg!(key_text, text_y, text_x);
                 ret = Some((text_y, text_x))
             }
         }
