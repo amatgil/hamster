@@ -83,7 +83,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
         match state {
             OverlayState::Selecting { ref mut key_seq } => {
                 let last_pressed = rl.get_char_pressed().filter(|k| !SPECIAL_KEYS.contains(k));
-                match (last_pressed, dbg!(shift_down_rn)) {
+                match (last_pressed, shift_down_rn) {
                     (Some(key), false) => key_seq.push(key),
                     (_, true) | (None, _) => {}
                 }
