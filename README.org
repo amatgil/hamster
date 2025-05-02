@@ -15,22 +15,23 @@ Main concept was inspired by [[mouseless][https://mouseless.click]].
 Install required dependencies (see =shell.nix=), then =make=.
 
 ** Usage
-(The deamon is yet unimplemented and might get scratched for a more dynamic approach)
-
-The core of =hamster= is the deamon (=hamsterwheel=): it waits for commands sent to it. Once it runs, commands can be sent via:
+=hamster= takes in one of four commands:
 - =hamstersend overlay=: cover the screen in a grid for moving the mouse
 - =hamstersend scrollup=: scroll up
 - =hamstersend scrolldown=: scroll down
 - =hamstersend click N=: click mouse button N (1 <= N <= 5)
 
-*** The Overlay
+*** The Overlay itself
 - Press =Esc= to close it
 - Press the two keys corresponding to the cell to move the mouse to its center.
 - Press =Space= to click in the center of the cell, or continue to press the corresponding keys for greating accuracy.
 
 ** TODO
+- [X] Display grid
+- [X] Big-scope movement
+- [X] Hone-in movement
+- [X] Clicking
 - [ ] Multi-monitor support
-- [ ] Hone-in clicking
 
 ** Demo
 TODO
