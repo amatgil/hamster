@@ -54,6 +54,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
 
     let mut queued_up_click = None;
     while !rl.window_should_close() {
+        let shift_down_rn = rl.is_key_down(KeyboardKey::KEY_LEFT_SHIFT);
         if rl.is_key_pressed(KeyboardKey::KEY_SPACE) {
             // It's queued up because the click must occur after the overlay closes
             queued_up_click = Some(match rl.is_key_pressed(KeyboardKey::KEY_LEFT_SHIFT) {
@@ -63,22 +64,28 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
             break;
         }
 
-        for (k, dy, dx) in [
+        for (must_shift, k, dy, dx) in [
             // Not vim because the letters are already in use for grid-selection :(
-            (KeyboardKey::KEY_LEFT, 0, -10),
-            (KeyboardKey::KEY_RIGHT, 0, 10),
-            (KeyboardKey::KEY_UP, -10, 0),
-            (KeyboardKey::KEY_DOWN, 10, 0),
+            (false, KeyboardKey::KEY_LEFT, 0, -10),
+            (false, KeyboardKey::KEY_RIGHT, 0, 10),
+            (false, KeyboardKey::KEY_UP, -10, 0),
+            (false, KeyboardKey::KEY_DOWN, 10, 0),
+            (true, KeyboardKey::KEY_H, 0, -10),
+            (true, KeyboardKey::KEY_J, 10, 0),
+            (true, KeyboardKey::KEY_K, -10, 0),
+            (true, KeyboardKey::KEY_L, 0, 10),
         ] {
-            if rl.is_key_down(k) {
+            if rl.is_key_down(k) && must_shift == shift_down_rn {
                 moveto_relative(dy, dx)?;
             }
         }
 
         match state {
             OverlayState::Selecting { ref mut key_seq } => {
-                if let Some(key) = rl.get_char_pressed().filter(|k| !SPECIAL_KEYS.contains(k)) {
-                    key_seq.push(key);
+                let last_pressed = rl.get_char_pressed().filter(|k| !SPECIAL_KEYS.contains(k));
+                match (last_pressed, dbg!(shift_down_rn)) {
+                    (Some(key), false) => key_seq.push(key),
+                    (_, true) | (None, _) => {}
                 }
                 let mut d = rl.begin_drawing(&thread);
                 d.clear_background(HAMSTER_BACKGROUND);
@@ -153,8 +160,9 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                         *base_x = *base_x + cell_width / 3i32.pow(rec_level as u32) * j;
                     }
                 }
-                if let Some(key) = last_pressed {
-                    spec_key_seq.push(key);
+                match (last_pressed, dbg!(shift_down_rn)) {
+                    (Some(key), false) => spec_key_seq.push(key),
+                    (_, true) | (None, _) => {}
                 }
             }
         }
