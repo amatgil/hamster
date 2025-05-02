@@ -33,6 +33,8 @@ pub const TARGET_FPS: u32 = 20;
 pub const LOCKED_RECT_COLOR: Color = Color::BLUE;
 pub const LOCKED_RECT_SIDE: i32 = 30;
 
+pub const OVERLAY_CLOSE_CLICK_DELAY_MS: u64 = 200;
+
 #[derive(Debug)]
 pub enum HWheelError {
     ForgotArgument,

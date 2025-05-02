@@ -3,7 +3,7 @@ use std::{thread::sleep, time::Duration};
 use hamster::{
     click, moveto, moveto_relative, HWheelError, KeyDistribution, CHILD_GAP, GRID_HEIGHT,
     GRID_WIDTH, HAMSTER_BACKGROUND, HAMSTER_OPACITY, LOCKED_RECT_COLOR, LOCKED_RECT_SIDE,
-    PADDING_H, PADDING_W, TARGET_FPS, TEXT_COLOR,
+    OVERLAY_CLOSE_CLICK_DELAY_MS, PADDING_H, PADDING_W, TARGET_FPS, TEXT_COLOR,
 };
 use raylib::prelude::*;
 
@@ -161,7 +161,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
     }
 
     std::mem::drop(rl); // TODO: This segfaults when main's scope ends. Fix
-    sleep(Duration::from_millis(20));
+    sleep(Duration::from_millis(OVERLAY_CLOSE_CLICK_DELAY_MS));
     if let Some(c) = queued_up_click {
         eprintln!("CLICKING BUTTON: {c}");
         click(c)?;
