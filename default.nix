@@ -15,11 +15,23 @@ let
     pkgs.xorg.libXi
     pkgs.xorg.libXinerama
     pkgs.xorg.libXrandr
+    pkgs.xorg.libxcb
+
+    pkgs.libxkbcommon
 
     pkgs.llvmPackages.libclang
     pkgs.llvmPackages.libcxxClang
     pkgs.clang
-];
+
+    pkgs.pkg-config
+
+
+    pkgs.libxkbcommon
+    pkgs.vulkan-loader
+    pkgs.wayland
+  ];
+
+  library_path = pkgs.lib.makeLibraryPath packages;
 in
 pkgs.rustPlatform.buildRustPackage rec {
   pname = manifest.name;
@@ -29,6 +41,19 @@ pkgs.rustPlatform.buildRustPackage rec {
   src = pkgs.lib.cleanSource ./.;
   meta.description = manifest.description ? null;
 
+
+  postInstall = ''
+    patchelf --add-needed $out/bin/${pname} libxkbcommon.so      
+    patchelf --add-needed $out/bin/${pname} libwayland-client.so 
+    patchelf --add-needed $out/bin/${pname} libvulkan.so         
+    patchelf --add-needed $out/bin/${pname} libX11.so.6
+    patchelf --add-needed $out/bin/${pname} libXlib.so           
+    patchelf --add-needed $out/bin/${pname} libXcursor.so        
+    patchelf --add-needed $out/bin/${pname} libXi.so             
+    patchelf --add-needed $out/bin/${pname} libvulkan.so         
+
+    patchelf --add-rpath ${library_path} $out/bin/${pname}
+'';
   nativeBuildInputs = packages;
   buildInputs = packages;
 
