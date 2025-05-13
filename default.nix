@@ -1,9 +1,9 @@
 {
-  pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") {}
+  pkgs ? import (fetchTarball "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz") { },
 }:
 let
   manifest = (pkgs.lib.importTOML ./Cargo.toml).package;
-  packages = [ 
+  packages = [
     pkgs.mold
     pkgs.cmake
     pkgs.pkgs.libGL
@@ -17,14 +17,11 @@ let
     pkgs.xorg.libXrandr
     pkgs.xorg.libxcb
 
-    pkgs.libxkbcommon
-
     pkgs.llvmPackages.libclang
     pkgs.llvmPackages.libcxxClang
     pkgs.clang
 
     pkgs.pkg-config
-
 
     pkgs.libxkbcommon
     pkgs.vulkan-loader
@@ -36,24 +33,21 @@ in
 pkgs.rustPlatform.buildRustPackage rec {
   pname = manifest.name;
   version = manifest.version;
-  cargoHash = pkgs.lib.fakeHash;
   cargoLock.lockFile = ./Cargo.lock;
   src = pkgs.lib.cleanSource ./.;
   meta.description = manifest.description ? null;
 
-
   postInstall = ''
-    patchelf --add-needed $out/bin/${pname} libxkbcommon.so      
-    patchelf --add-needed $out/bin/${pname} libwayland-client.so 
-    patchelf --add-needed $out/bin/${pname} libvulkan.so         
-    patchelf --add-needed $out/bin/${pname} libX11.so.6
-    patchelf --add-needed $out/bin/${pname} libXlib.so           
-    patchelf --add-needed $out/bin/${pname} libXcursor.so        
-    patchelf --add-needed $out/bin/${pname} libXi.so             
-    patchelf --add-needed $out/bin/${pname} libvulkan.so         
+    patchelf $out/bin/${pname} --add-needed libxkbcommon.so
+    patchelf $out/bin/${pname} --add-needed libwayland-client.so
+    patchelf $out/bin/${pname} --add-needed libvulkan.so
+    patchelf $out/bin/${pname} --add-needed libX11.so.6
+    patchelf $out/bin/${pname} --add-needed libXcursor.so
+    patchelf $out/bin/${pname} --add-needed libXi.so
+    patchelf $out/bin/${pname} --add-needed libvulkan.so
 
-    patchelf --add-rpath ${library_path} $out/bin/${pname}
-'';
+    patchelf $out/bin/${pname} --add-rpath ${library_path}
+  '';
   nativeBuildInputs = packages;
   buildInputs = packages;
 
@@ -61,6 +55,5 @@ pkgs.rustPlatform.buildRustPackage rec {
   BINDGEN_EXTRA_CLANG_ARGS =
     with pkgs;
     "-isystem ${llvmPackages.libclang.lib}/lib/clang/${lib.versions.major (lib.getVersion clang)}/include";
-
 
 }
