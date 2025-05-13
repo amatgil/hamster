@@ -160,7 +160,7 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
                         *base_x = *base_x + cell_width / 3i32.pow(rec_level as u32) * j;
                     }
                 }
-                match (last_pressed, dbg!(shift_down_rn)) {
+                match (last_pressed, shift_down_rn) {
                     (Some(key), false) => spec_key_seq.push(key),
                     (_, true) | (None, _) => {}
                 }
