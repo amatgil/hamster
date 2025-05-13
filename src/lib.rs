@@ -90,7 +90,12 @@ impl Termination for HWheelError {
 }
 
 pub fn click(btn: &str) -> Result<(), HWheelError> {
-    match Command::new("xdotool").arg("click").arg(btn).spawn() {
+    match Command::new("xdotool")
+        .arg("--clearmodifiers")
+        .arg("click")
+        .arg(btn)
+        .spawn()
+    {
         Ok(_c) => Ok(()),
         Err(e) => Err(HWheelError::CouldNotReachXDoTool(Box::new(e))),
     }
