@@ -6,7 +6,7 @@ let
   packages = [
     pkgs.mold
     pkgs.cmake
-    pkgs.pkgs.libGL
+    pkgs.libGL
 
     # X11 dependencies
     pkgs.xorg.libX11
@@ -26,6 +26,7 @@ let
     pkgs.libxkbcommon
     pkgs.vulkan-loader
     pkgs.wayland
+    pkgs.glfw
   ];
 
   library_path = pkgs.lib.makeLibraryPath packages;
@@ -45,6 +46,7 @@ pkgs.rustPlatform.buildRustPackage rec {
     patchelf $out/bin/${pname} --add-needed libXcursor.so
     patchelf $out/bin/${pname} --add-needed libXi.so
     patchelf $out/bin/${pname} --add-needed libvulkan.so
+    patchelf $out/bin/${pname} --add-needed libGLX.so
 
     patchelf $out/bin/${pname} --add-rpath ${library_path}
   '';

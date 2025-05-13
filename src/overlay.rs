@@ -15,6 +15,8 @@ const KEYS: KeyDistribution<{ GRID_WIDTH as usize }> = KeyDistribution::new(
 
 const SPECIAL_KEYS: [char; 1] = [' '];
 
+const UIUA386_BYTES: &[u8; 263124] = include_bytes!("../assets/Uiua386.ttf");
+
 #[derive(Debug)]
 enum OverlayState {
     /// When it's first opened up and we're selecting the region
@@ -47,8 +49,8 @@ pub fn bring_up_overlay() -> Result<(), HWheelError> {
     let font_size = cell_height;
 
     let uiua386 = rl
-        .load_font_ex(&thread, "assets/Uiua386.ttf", cell_height, None)
-        .expect("could not find uiua386");
+        .load_font_from_memory(&thread, ".ttf", UIUA386_BYTES, cell_height, None)
+        .expect("could not parse uiua386");
 
     let mut state = OverlayState::Selecting { key_seq: vec![] };
 
