@@ -91,8 +91,8 @@ impl Termination for HWheelError {
 
 pub fn click(btn: &str) -> Result<(), HWheelError> {
     match Command::new("xdotool")
-        .arg("--clearmodifiers")
         .arg("click")
+        .arg("--clearmodifiers")
         .arg(btn)
         .spawn()
     {
