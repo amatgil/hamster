@@ -35,3 +35,6 @@ Install required dependencies (see =shell.nix=), then =make=.
 
 ** Demo
 TODO
+
+* TODO/Ideas
+Make the inner, specifying grid be 2×2 instead of 1-⍨3×3: this would make selecting much faster
