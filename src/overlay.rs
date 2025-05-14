@@ -287,7 +287,7 @@ fn draw_smaller_grid_letters(
             }
             let text_x = base_x + j * cell_width / s + cell_width / s / 2;
             let text_y = base_y + i * cell_height / s - cell_height / s / 2;
-            let key_text = KEYS.get(i, j + 5).unwrap_or('?');
+            let key_text = KEYS.get(i, j + 6).unwrap_or('?');
 
             d.draw_text_ex(
                 uiua386,
